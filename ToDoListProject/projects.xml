@@ -1,0 +1,29 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<projects>
+	<project name="projekt1">
+		<task title="planera">
+			<date>5/2</date>
+			<status>0</status>
+		</task>
+		<task title="bygga">
+			<date>7/2</date>
+			<status>0</status>
+		</task>
+		<task title="laga">
+			<date>9/2</date>
+			<status>1</status>
+		</task>
+	</project>
+	<project name="zprojekt2">
+		<task title="fixa">
+			<date>1/3</date>
+			<status>0</status>
+		</task>
+	</project>
+	<project name="aprojekt3">
+		<task title="dona">
+			<date>1/4</date>
+			<status>0</status>
+		</task>		
+	</project>
+</projects>
