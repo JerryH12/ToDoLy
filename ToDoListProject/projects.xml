@@ -17,10 +17,10 @@
 	<project name="zprojekt2">
 		<task title="fixa">
 			<date>1/3</date>
-			<status>0</status>
+			<status>1</status>
 		</task>
 	</project>
-	<project name="aprojekt3">
+	<project name="projekt3">
 		<task title="dona">
 			<date>1/4</date>
 			<status>0</status>

@@ -1,53 +1,91 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Net.NetworkInformation;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace ToDoListProject
 {
     internal class ToDoList
     {
        ///<summary>
-       ///<para>A collection of Projects</para>
+       /// A collection of Projects.
         ///</summary>
-        public List<Project> Projects { get; }
+        public Dictionary<string, Project> Projects { get; }
 
         public ToDoList() 
         {
-            Projects = new List<Project>();
+            Projects = [];
         }
 
-        public int CountTasks()
+        public int CountFinishedTasks()
         {
             int sum = 0;
 
-            foreach(var item in Projects)
+            foreach (KeyValuePair<string, Project> item in Projects)
             {
-                sum += item.CountTasks();
+                sum += item.Value.CountTasksByCompletion(true);
+            }
+            return sum;
+        }
+        public int CountUnfinishedTasks()
+        {
+            int sum = 0;
+
+            foreach(KeyValuePair<string, Project> item in Projects)
+            {
+                sum += item.Value.CountTasksByCompletion(false);
             }
             return sum;
         }
 
-        public void RemoveTask(string projectName, string task)
+        public void AddTask(string projectName, string taskName, string date="31/12", int status=0)
         {
-
+            if (Projects.ContainsKey(projectName))
+            {
+                Projects[projectName].addTask(taskName, date, status);
+            }
+            else
+            {
+                Project project1 = new Project(projectName);
+                project1.addTask(taskName, date, status);
+                Projects.Add(projectName, project1);
+            }
         }
 
+        public void RemoveTask(string projectName, string task)
+        {
+            // ToDo
+            if (Projects.ContainsKey(projectName))
+            {
+                //Projects[projectName].RemoveTask();
+            }
+           
+        }
+
+        /// <summary>
+        /// Shows an entire list of Projects and Tasks.
+        /// </summary>
         public void ShowToDoList()
         {
-            foreach(Project projectItem in Projects)
+            foreach(KeyValuePair<string, Project> projectItem in Projects)
             {
-                Console.WriteLine("\nProject: " + projectItem.projectName);
-                projectItem.ShowTasks();
+                Console.WriteLine("\nProject: " + projectItem.Value.projectName);
+                projectItem.Value.ShowTasks();
                 Console.WriteLine("------------------------------------------------------------------------");
             }
         }
 
+        /// <summary>
+        /// Loads an XML file and maps it to objects.
+        /// </summary>
+        /// <param name="name"></param>
         public void LoadFile(string name)
-        {
-       
+        { 
             string filename = name;
            // string path = Path.GetDirectoryName(System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName);
            // Console.Write(path);
@@ -71,19 +109,23 @@ namespace ToDoListProject
                    
                 }
 
-                Projects.Add(project1);
+                Projects.Add(project1.projectName, project1);
             }
         }
+
+        /// <summary>
+        /// Maps objects and saves it as an XM file.
+        /// </summary>
         public void SaveToFile()
         {
             XElement XMLdocument = new XElement("projects");
 
-            foreach (Project projectItem in Projects)
+            foreach (KeyValuePair<string, Project> projectItem in Projects)
             {
                 XElement element = new XElement("project");
-                element.SetAttributeValue("name", projectItem.projectName);
+                element.SetAttributeValue("name", projectItem.Value.projectName);
 
-                foreach(Task taskItem in projectItem.tasks)
+                foreach(Task taskItem in projectItem.Value.tasks)
                 {
                     string title = (string)taskItem.title;
                     int status = (int)taskItem.status;

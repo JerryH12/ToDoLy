@@ -32,10 +32,11 @@ ToDoList todoly = new ToDoList();
 todoly.LoadFile("../../../projects.xml");
 bool go = true;
 
+//Console.WriteLine(todoly.Projects["projekt3"].projectName);
 while (go)
 {
     Console.WriteLine($">> {RED}Welcome{NORMAL} to {YELLOW}ToDoLy{NORMAL}");
-    Console.WriteLine($">> You have {todoly.CountTasks()} tasks todo and Y tasks are done!");
+    Console.WriteLine($">> You have {todoly.CountFinishedTasks()} tasks todo and {todoly.CountUnfinishedTasks()} tasks are done!");
     Console.WriteLine(">> Pick an option:");
     Console.WriteLine($"{CYAN}>>{NORMAL} ({MAGENTA}1{NORMAL}) Show Task List (by date or project)");
     Console.WriteLine($"{CYAN}>>{NORMAL} ({MAGENTA}2{NORMAL}) Add New Task");
@@ -50,13 +51,15 @@ while (go)
             todoly.ShowToDoList();
             break;
         case "2":
-           
+            Console.WriteLine("Enter a name for the task.");
+            string taskName = Console.ReadLine();
+            todoly.AddTask("projekt3", taskName);
             break;
         case "3":
             Console.WriteLine("pressed 3");
             break;
         case "4":
-           // todoly.SaveToFile();
+            todoly.SaveToFile();
             go = false;
             break;
         default:

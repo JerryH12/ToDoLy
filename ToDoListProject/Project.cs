@@ -11,7 +11,7 @@ namespace ToDoListProject
     internal class Project
     {
         /// <summary>
-        /// <para>A Task collection</para>
+        /// A collection of Tasks.
         /// </summary>
         public List<Task> tasks { get;set; }
         private List<Task> sortedTasks;
@@ -36,6 +36,19 @@ namespace ToDoListProject
         {
             //List<Task> sortedTasks = new List<Task>();
             sortedTasks = tasks.OrderBy(item => item.dueDate).ToList();
+        }
+
+        
+
+        /// <summary>
+        /// Counts the number of Tasks by completion
+        /// </summary>
+        /// <returns>int</returns>
+        public int CountTasksByCompletion(bool isCompleted)
+        {
+            int status = isCompleted == false ? 0 : 1;
+            int countedUnfinishedTasks = tasks.Where(task => task.status == status).Count();
+            return countedUnfinishedTasks;
         }
 
         public int CountTasks()
