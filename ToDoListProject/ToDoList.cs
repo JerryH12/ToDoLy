@@ -17,9 +17,20 @@ namespace ToDoListProject
         ///</summary>
         public Dictionary<string, Project> Projects { get; }
 
+        public Project SelectedProject { get; set; }
+
         public ToDoList() 
         {
             Projects = [];
+            LoadFile("../../../projects.xml");
+            SetCurrentProject("work"); // TODO: remember from previous settings.
+            Window window1 = new Window();
+
+        }
+
+        public void SetCurrentProject(string projectName)
+        {
+            SelectedProject = Projects[projectName];
         }
 
         public int CountFinishedTasks()
@@ -65,6 +76,11 @@ namespace ToDoListProject
                 //Projects[projectName].RemoveTask();
             }
            
+        }
+
+        public void EditTask(string projectName, int taskIndex, string newTitle)
+        {
+            Projects[projectName].EditTask(taskIndex, newTitle);
         }
 
         /// <summary>

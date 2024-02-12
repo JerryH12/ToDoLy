@@ -64,6 +64,11 @@ namespace ToDoListProject
             }
         }
 
+        public void EditTask(int index, string newTitle)
+        {
+            Task task1 = tasks.ElementAt(index);
+            task1.title = newTitle;
+        }
 
         public void addTask(string title, string date, int status)
         {
