@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using System.Xml.Linq;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
-namespace ToDoListProject
+namespace ToDoLy
 {
     internal class ToDoList
     {
@@ -24,7 +24,6 @@ namespace ToDoListProject
             Projects = [];
             LoadFile("../../../projects.xml");
             SetCurrentProject("work"); // TODO: remember from previous settings.
-            Window window1 = new Window();
 
         }
 

@@ -6,11 +6,13 @@
 // Load and save task lists to file. The solution may also include other creative features at your discretion in case you wish to show some flair.
 
 using System.Xml.Linq;
-using ToDoListProject;
+using ToDoLy;
 using System.IO;
 using static System.Net.Mime.MediaTypeNames;
 using System.Net.Http;
 using System.Diagnostics;
+using System.Reflection.Metadata.Ecma335;
+using System;
 
 string NL = Environment.NewLine; // shortcut
 string NORMAL = Console.IsOutputRedirected ? "" : "\x1b[39m";
@@ -30,20 +32,28 @@ string NOREVERSE = Console.IsOutputRedirected ? "" : "\x1b[27m";
 
 ToDoList todoly = new ToDoList();
 string projectName = todoly.SelectedProject.projectName;
-
 bool go = true;
+bool rerun = false;
+string input="";
 
 while (go)
 {
-    Console.WriteLine($">> {RED}Welcome{NORMAL} to {YELLOW}ToDoLy{NORMAL}");
-    Console.WriteLine($">> You have {todoly.CountFinishedTasks()} tasks todo and {todoly.CountUnfinishedTasks()} tasks are done!");
-    Console.WriteLine(">> Pick an option:");
-    Console.WriteLine($"{CYAN}>>{NORMAL} ({MAGENTA}1{NORMAL}) Show Task List (by date or project)");
-    Console.WriteLine($"{CYAN}>>{NORMAL} ({MAGENTA}2{NORMAL}) Add New Task");
-    Console.WriteLine($"{CYAN}>>{NORMAL} ({MAGENTA}3{NORMAL}) Edit Task (update, mark as done, remove)");
-    Console.WriteLine($"{CYAN}>>{NORMAL} ({MAGENTA}4{NORMAL}) Save and Quit");
+    
 
-    string input = Console.ReadLine();
+    // check whether to continue with the previous input or select another one.
+    if (!rerun) 
+    {
+        Console.WriteLine($">> {RED}Welcome{NORMAL} to {YELLOW}ToDoLy{NORMAL}");
+        Console.WriteLine($">> You have {todoly.CountFinishedTasks()} tasks todo and {todoly.CountUnfinishedTasks()} tasks are done!");
+        Console.WriteLine(">> Pick an option:");
+        Console.WriteLine($"{CYAN}>>{NORMAL} ({MAGENTA}1{NORMAL}) Show Task List (by date or project)");
+        Console.WriteLine($"{CYAN}>>{NORMAL} ({MAGENTA}2{NORMAL}) Add New Task");
+        Console.WriteLine($"{CYAN}>>{NORMAL} ({MAGENTA}3{NORMAL}) Edit Task (update, mark as done, remove)");
+        Console.WriteLine($"{CYAN}>>{NORMAL} ({MAGENTA}4{NORMAL}) Save and Quit");
+
+        input = Console.ReadLine();
+    }
+    rerun = true; 
 
     switch (input)
     {
@@ -58,45 +68,53 @@ while (go)
             todoly.AddTask(projectName, taskName);
             break;
         case "3":
-            // Select a project.
-            Console.WriteLine($"{CYAN}{UNDERLINE}{projectName}{NOUNDERLINE}{NORMAL}");
-            
-
-            // TODO: let user select another project by entering P.
-            //projectName = Console.ReadLine();
-            //Console.WriteLine($"{CYAN}{UNDERLINE}{projectName}{NOUNDERLINE}{NORMAL}");
-
+            Console.WriteLine("---------------------------------------------------------------------------------------");
+            //Console.WriteLine($"Project: {CYAN}{UNDERLINE}{projectName}{NOUNDERLINE}{NORMAL}");
+            Console.WriteLine($"Tasks to be done in {projectName}:");
             // Show a list of tasks for this project.
+   
             int index = 1;
-            foreach(ToDoListProject.Task item in todoly.SelectedProject.tasks)
+            foreach(ToDoLy.Task item in todoly.SelectedProject.tasks)
             {
-                Console.WriteLine($"({MAGENTA}{index}{NORMAL}) " + item.title);
+                string statusDescription = item.status == 1 ? "Finished" : "Unfinished";
+                Console.WriteLine($"\n({MAGENTA}{index}{NORMAL}) * " + item.title.PadRight(20) + "Due date: " + item.dueDate.PadRight(20) + "Status: " + statusDescription);
                 index++;
             }
 
-            Console.WriteLine("Enter a number to edit a task: | To select another project - enter \"P\": | To quit - enter \"Q\": ");
+            Console.WriteLine("\nEnter a number to edit a task: | To select another project - enter \"P\": | To quit - enter \"Q\": ");
 
             try
             {
                 // Select the task to be edited or deleted.
-                //Console.Write("To select a task you want to change - enter a number: | To quit - enter \"Q\": ");
-
-                string userInput = Console.ReadLine();
+                string userInput = Console.ReadLine().ToLower();
 
                 if (int.TryParse(userInput, out int value)) 
                 { 
                     int taskID = value - 1;
-                    ToDoListProject.Task currentTask = todoly.SelectedProject.tasks.ElementAt(taskID);
-                    Console.WriteLine("Task: " + currentTask.title.PadRight(20) + "Due date: " + currentTask.dueDate.PadRight(20) + "Status: " + currentTask.status);
-                    Console.Write("To delete this task - enter \"D\" | To alter the name - enter \"N\" | To update the status - enter \"S\" | To quit - enter \"Q\": ");
-                    // Edit the task.
-                    Console.WriteLine("New name for the task?");
-                    string newTitle = Console.ReadLine();
-                    currentTask.title = newTitle;
+                    ToDoLy.Task currentTask = todoly.SelectedProject.tasks.ElementAt(taskID);
+                    string statusDescription = currentTask.status == 1 ? "Finished" : "Unfinished";
+
+                    Console.WriteLine("---------------------------------------------------------------------------------------");
+                    Console.WriteLine("Task: " + currentTask.title.PadRight(20) + "Due date: " + currentTask.dueDate.PadRight(20) + "Status: " + statusDescription);
+                    
+                    // select options
+                    Console.Write("\nTo delete this task - enter \"D\" | To alter the name - enter \"N\" | To update the status - enter \"S\" | To quit - enter \"Q\": ");
+                    userInput = Console.ReadLine();
+                    TaskOptions(currentTask, userInput);
+                    
                 }
-                else if(userInput == "P")
-                {
-                    //TODO
+                else if(userInput == "p")
+                { 
+                    foreach(KeyValuePair<string, ToDoLy.Project> projectItem in todoly.Projects)
+                    {
+                        Console.WriteLine($"{CYAN}{projectItem.Value.projectName}{ NORMAL}");
+                    }
+
+                    Console.WriteLine("Select one of the projects: ");
+                    projectName = Console.ReadLine();
+                    todoly.SetCurrentProject(projectName);
+                    rerun = true;
+                    //Console.WriteLine($"{CYAN}{UNDERLINE}{projectName}{NOUNDERLINE}{NORMAL}");
                 }
             }
             catch(Exception ex)
@@ -109,10 +127,42 @@ while (go)
             go = false;
             break;
         default:
-            //
             break;
     }
+}
 
+void TaskOptions(ToDoLy.Task task1, string options)
+{
+    switch (options.ToLower())
+    {
+        case "d":
+            // delete
+            break;
+        case "n":
+            // alter the name.
+            Console.Write("\nEnter a new name for this task: ");
+            string newTitle = Console.ReadLine();
+            task1.title = newTitle;
+            break;
+        case "s":
+            // update status
+            Console.WriteLine("\nIf the task is finished - type \"Y\". Otherwise \"N\".");
+            string userInput = Console.ReadLine().ToLower();
+            if (userInput == "y")
+            {
+                task1.status = 1;
+            }
+            else if (userInput == "n")
+            {
+                task1.status = 0;
+            }
+            break;
+        case "q":
+            break;
+        default:
+            break;
+    }
+    return;
 }
 
 
