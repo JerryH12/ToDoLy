@@ -16,22 +16,32 @@ namespace ToDoLy
        /// A collection of Projects.
         ///</summary>
         public Dictionary<string, Project> Projects { get; }
+        public Dictionary<string,Project> SortedProjects { get; set; }
 
         public Project SelectedProject { get; set; }
 
         public ToDoList() 
         {
             Projects = [];
-            LoadFile("../../../projects.xml");
-            SetCurrentProject("work"); // TODO: remember from previous settings.
 
+            LoadFile("projects.xml");
+            SetCurrentProject("Work"); // TODO: remember from previous settings.
+            SortTasksByDate();
         }
 
+        /// <summary>
+        /// Select the project to work on
+        /// </summary>
+        /// <param name="projectName"></param>
         public void SetCurrentProject(string projectName)
         {
             SelectedProject = Projects[projectName];
         }
 
+        /// <summary>
+        /// Count finished tasks
+        /// </summary>
+        /// <returns>Number of finished tasks</returns>
         public int CountFinishedTasks()
         {
             int sum = 0;
@@ -42,6 +52,11 @@ namespace ToDoLy
             }
             return sum;
         }
+
+        /// <summary>
+        /// Count unfinished tasks
+        /// </summary>
+        /// <returns>Number of finished tasks</returns>
         public int CountUnfinishedTasks()
         {
             int sum = 0;
@@ -53,7 +68,14 @@ namespace ToDoLy
             return sum;
         }
 
-        public void AddTask(string projectName, string taskName, string date="31/12", int status=0)
+        /// <summary>
+        /// Add task
+        /// </summary>
+        /// <param name="projectName"></param>
+        /// <param name="taskName"></param>
+        /// <param name="date"></param>
+        /// <param name="status"></param>
+        public void AddTask(string projectName, string taskName, DateTime date, int status=0)
         {
             if (Projects.ContainsKey(projectName))
             {
@@ -67,31 +89,68 @@ namespace ToDoLy
             }
         }
 
-        public void RemoveTask(string projectName, string task)
+        /// <summary>
+        /// Remove a task
+        /// </summary>
+        /// <param name="task1"></param>
+        public void RemoveTask(Task task1)
         {
             // ToDo
-            if (Projects.ContainsKey(projectName))
+            if (Projects.ContainsKey(SelectedProject.projectName))
             {
-                //Projects[projectName].RemoveTask();
+                Projects[SelectedProject.projectName].RemoveTask(task1);
             }
            
         }
 
+        /// <summary>
+        /// Edit a task
+        /// </summary>
+        /// <param name="projectName"></param>
+        /// <param name="taskIndex"></param>
+        /// <param name="newTitle"></param>
         public void EditTask(string projectName, int taskIndex, string newTitle)
         {
             Projects[projectName].EditTask(taskIndex, newTitle);
         }
 
         /// <summary>
-        /// Shows an entire list of Projects and Tasks.
+        /// Sort tasks by the project name
+        /// </summary>
+        public void SortTasksByProject()
+        {
+            // Sort dictionary by the project name.
+            SortedProjects = Projects.OrderBy(item=> item.Value.projectName).ToDictionary(); 
+        }
+
+        /// <summary>
+        /// Sort tasks by date
+        /// </summary>
+        public void SortTasksByDate()
+        {
+            // Sort each project task list by date
+            foreach (KeyValuePair<string, Project> projectItem in Projects)
+            {
+                projectItem.Value.SortTasksByDate();
+            }
+
+            // Sort each project according to the date of the first task
+            SortedProjects = Projects.OrderBy(item => item.Value.sortedTasks[0].DueDate).ToDictionary();
+
+        }
+
+        /// <summary>
+        /// Shows an entire list of projects and tasks.
         /// </summary>
         public void ShowToDoList()
         {
-            foreach(KeyValuePair<string, Project> projectItem in Projects)
+            Console.WriteLine("To-Do List");
+            Console.WriteLine("----------");
+            foreach (KeyValuePair<string, Project> projectItem in SortedProjects)
             {
-                Console.WriteLine("\nProject: " + projectItem.Value.projectName);
+                Console.WriteLine("" + projectItem.Value.projectName);
                 projectItem.Value.ShowTasks();
-                Console.WriteLine("------------------------------------------------------------------------");
+                Console.WriteLine("---------------------------------------------------------------------------");
             }
         }
 
@@ -99,13 +158,10 @@ namespace ToDoLy
         /// Loads an XML file and maps it to objects.
         /// </summary>
         /// <param name="name"></param>
-        public void LoadFile(string name)
-        { 
-            string filename = name;
-           // string path = Path.GetDirectoryName(System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName);
-           // Console.Write(path);
-           // var projectsFilePath = Path.Combine(path, filename);
-            XElement XMLdocument = XElement.Load(name);
+        public void LoadFile(string filename)
+        {
+            string filePath = Path.Combine(Environment.CurrentDirectory, "projects.xml");
+            XElement XMLdocument = XElement.Load(filePath);
 
             IEnumerable<XElement> elements = from item in XMLdocument.Descendants("project")
                                              select item;
@@ -120,7 +176,7 @@ namespace ToDoLy
                     string title = (string)child.Attribute("title");
                     string date = ((string)child.Element("date").Value);
                     int status = int.Parse((string)child.Element("status").Value);
-                    project1.addTask(title, date, status);
+                    project1.addTask(title, Convert.ToDateTime(date), status);
                    
                 }
 
@@ -142,19 +198,21 @@ namespace ToDoLy
 
                 foreach(Task taskItem in projectItem.Value.tasks)
                 {
-                    string title = (string)taskItem.title;
-                    int status = (int)taskItem.status;
+                    string title = (string)taskItem.Title;
+                    int status = (int)taskItem.Status;
 
                     XElement childElement = new XElement("task",
-                        new XElement("date", taskItem.dueDate),
-                        new XElement("status", taskItem.status.ToString()));
+                        new XElement("date", taskItem.DueDate.ToString("yy-MM-dd")),
+                        new XElement("status", taskItem.Status.ToString()));
 
-                    childElement.SetAttributeValue("title", taskItem.title);
+                    childElement.SetAttributeValue("title", taskItem.Title);
                     element.Add(childElement);
                 }
                 XMLdocument.Add(element);
             }
-            XMLdocument.Save("nexxml.xml");
+
+            string filePath = Path.Combine(Environment.CurrentDirectory, "projects.xml");
+            XMLdocument.Save(filePath);
         }
     }
 }
