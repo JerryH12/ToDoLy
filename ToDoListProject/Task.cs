@@ -2,47 +2,36 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Net.NetworkInformation;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ToDoListProject
+namespace ToDoLy
 {
     internal class Task
     {
-        public string title { get; set; }
-        public string dueDate { get; set; }
-        public int status { get; set; }
+        public string Title { get; set; }
+        public DateTime DueDate { get; set; }
+        public int Status { get; set; }
 
-        public Task(string title) 
-        {
-            this.title = title;
-        }
+        public string StatusText {  get; set; }
 
-        public Task(string title, string dueDate, int status)
+        public Task(string title, DateTime dueDate, int status = 0)
         {
-            this.title = title;
-            this.dueDate = dueDate;
-            this.status = status;
-        }
-
-        public void add()
-        {
-            //ToDo
-        }
-
-        public void remove()
-        {
-            //ToDo
-        }
-
-        public void edit()
-        {
-            //ToDo
+            Title = title;
+            DueDate = dueDate;
+            Status = status;
         }
 
         public void markAsDone()
         {
             //ToDo
+        }
+
+        public void Print()
+        {
+            StatusText = (Status == 1) ? "\u001b[92mFinished\u001b[39m" : "\u001b[93mUnfinished\u001b[39m";
+            Console.WriteLine("Task: " + Title.PadRight(20) + "Due date: " + DueDate.ToString("yy-MM-dd").PadRight(20) + "Status: " + StatusText);
         }
     }
 }
