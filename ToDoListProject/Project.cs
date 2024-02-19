@@ -25,9 +25,14 @@ namespace ToDoLy
             sortedTasks = tasks;
         }
 
-        public void SortTasksByDate()
+        public void SortTasksByDateAscending()
         {
             sortedTasks = tasks.OrderBy(item => item.DueDate).ToList();
+        }
+
+        public void SortTasksByDateDescending()
+        {
+            sortedTasks = tasks.OrderByDescending(item => item.DueDate).ToList();
         }
 
         /// <summary>

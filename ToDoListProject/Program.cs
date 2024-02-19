@@ -44,10 +44,12 @@ while (go)
         Console.WriteLine($"{CYAN}>>{NORMAL} {BOLD}{RED}Welcome to ToDoLy{NORMAL}{NOBOLD}");
         Console.WriteLine($"{CYAN}>>{NORMAL} You have {YELLOW}{todoly.CountUnfinishedTasks()} tasks todo{NORMAL} and {GREEN}{todoly.CountFinishedTasks()} tasks are done!{GREEN}{NORMAL}");
         Console.WriteLine($"{CYAN}>>{NORMAL} Pick an option:");
-        Console.WriteLine($"{CYAN}>>{NORMAL} ({MAGENTA}1{NORMAL}) Show Task List (by date or project)");
-        Console.WriteLine($"{CYAN}>>{NORMAL} ({MAGENTA}2{NORMAL}) Add New Task");
-        Console.WriteLine($"{CYAN}>>{NORMAL} ({MAGENTA}3{NORMAL}) Edit Task (update, mark as done, remove)");
-        Console.WriteLine($"{CYAN}>>{NORMAL} ({MAGENTA}4{NORMAL}) Save and Quit");
+        Console.WriteLine($"{CYAN}>>{NORMAL} ({MAGENTA}1{NORMAL}) Show To-Do list");
+        Console.WriteLine($"{CYAN}>>{NORMAL} ({MAGENTA}2{NORMAL}) List Sorted by Project");
+        Console.WriteLine($"{CYAN}>>{NORMAL} ({MAGENTA}3{NORMAL}) List Sorted by Date Descending");
+        Console.WriteLine($"{CYAN}>>{NORMAL} ({MAGENTA}4{NORMAL}) Add New Task");
+        Console.WriteLine($"{CYAN}>>{NORMAL} ({MAGENTA}5{NORMAL}) Edit Task");
+        Console.WriteLine($"{CYAN}>>{NORMAL} ({MAGENTA}6{NORMAL}) Save and Quit");
 
         input = Console.ReadLine();
     }
@@ -64,21 +66,36 @@ void MainOptions(string options)
     {
         case "1":
             // Show a complete list of projects and tasks.
+            todoly.SortTasksByDateAscending();
             todoly.ShowToDoList();
             break;
         case "2":
-            // Add a new task.
-            Console.Write("Enter a name for the new task: ");
-            string taskName = Console.ReadLine();
-            Console.Write("Enter the date for the deadline: ");
-            string dueDate = Console.ReadLine();
-            todoly.AddTask(projectName, taskName, Convert.ToDateTime(dueDate));
-            Console.WriteLine("Task added successfully!");
-            //TODO: Select a project. Also add due date. Show message Done! when successful. Able to quit.
-            break;
+            todoly.SortTasksByProject();
+            todoly.ShowToDoList();
+            break; 
         case "3":
+            todoly.SortTasksByDateDescending();
+            todoly.ShowToDoList();
+            break;
+        case "4":
+            try
+            {
+                // Add a new task.
+                Console.Write("Enter a name for the new task: ");
+                string taskName = Console.ReadLine();
+                Console.Write("Enter the date for the deadline: ");
+                string dueDate = Console.ReadLine();
+                todoly.AddTask(projectName, taskName, Convert.ToDateTime(dueDate));
+                Console.WriteLine("Task added successfully!");
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            break;
+        case "5":
             Console.WriteLine("---------------------------------------------------------------------------------------");       
-            Console.WriteLine($"Tasks to be done in {projectName}:");
+            Console.WriteLine($"Tasks to be done in {CYAN}{projectName}{NORMAL}:");
 
             // Show a list of tasks for this project.
             int index = 1;
@@ -138,7 +155,7 @@ void MainOptions(string options)
                 Console.WriteLine(ex.Message);
             }
             break;
-        case "4":
+        case "6":
             todoly.SaveToFile();
             go = false;
             break;

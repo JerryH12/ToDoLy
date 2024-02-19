@@ -26,7 +26,7 @@ namespace ToDoLy
 
             LoadFile("projects.xml");
             SetCurrentProject("Work"); // TODO: remember from previous settings.
-            SortTasksByDate();
+            SortTasksByDateAscending(); // default sorting method.
         }
 
         /// <summary>
@@ -99,8 +99,7 @@ namespace ToDoLy
             if (Projects.ContainsKey(SelectedProject.projectName))
             {
                 Projects[SelectedProject.projectName].RemoveTask(task1);
-            }
-           
+            }     
         }
 
         /// <summary>
@@ -124,18 +123,34 @@ namespace ToDoLy
         }
 
         /// <summary>
-        /// Sort tasks by date
+        /// Sort tasks by date ascending
         /// </summary>
-        public void SortTasksByDate()
+        public void SortTasksByDateAscending()
         {
             // Sort each project task list by date
             foreach (KeyValuePair<string, Project> projectItem in Projects)
             {
-                projectItem.Value.SortTasksByDate();
+                projectItem.Value.SortTasksByDateAscending();
             }
 
             // Sort each project according to the date of the first task
             SortedProjects = Projects.OrderBy(item => item.Value.sortedTasks[0].DueDate).ToDictionary();
+
+        }
+
+        /// <summary>
+        /// Sort tasks by date descending
+        /// </summary>
+        public void SortTasksByDateDescending()
+        {
+            // Sort each project task list by date
+            foreach (KeyValuePair<string, Project> projectItem in Projects)
+            {
+                projectItem.Value.SortTasksByDateDescending();
+            }
+
+            // Sort each project according to the date of the first task
+            SortedProjects = Projects.OrderByDescending(item => item.Value.sortedTasks[0].DueDate).ToDictionary();
 
         }
 
