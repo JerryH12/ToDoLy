@@ -15,13 +15,13 @@ namespace ToDoLy
         /// </summary>
         public List<Task> tasks { get;set; }
         public List<Task> sortedTasks { get; set; }
-       
+
         public string projectName { get; set; }
 
         public Project(string name)
         {
             projectName = name;
-            tasks = new List<Task>();
+            tasks = new List<Task>();  
             sortedTasks = tasks;
         }
 
@@ -74,10 +74,6 @@ namespace ToDoLy
         public void RemoveTask(Task task1)
         {
             tasks.Remove(task1);
-        }
-
-       
-
-      
+        }  
     }
 }

@@ -1,5 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
-<projects>
+<projects xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:noNamespaceSchemaLocation="projects.xsd">
 	<project name="Travel">
 		<task title="Get a passport">
 			<date>2024-05-02</date>
@@ -28,9 +29,6 @@
 		<task title="Go for a walk">
 			<date>2022-01-04</date>
 			<status>1</status>
-		</task>		
-	</project>
-	<project name="Other">
-		
+		</task>
 	</project>
 </projects>

@@ -30,16 +30,41 @@ namespace ToDoLy
         }
 
         /// <summary>
-        /// Select the project to work on
+        /// Select the project to work on.
         /// </summary>
         /// <param name="projectName"></param>
         public void SetCurrentProject(string projectName)
         {
-            SelectedProject = Projects[projectName];
+            if (Projects.ContainsKey(projectName))
+            {
+                SelectedProject = Projects[projectName];
+            }
         }
 
         /// <summary>
-        /// Count finished tasks
+        /// Add a new project.
+        /// </summary>
+        public void AddProject(string projectName)
+        {
+            try
+            {
+                if (!Projects.ContainsKey(projectName))
+                {
+                    Projects.Add(projectName, new Project(projectName));
+                    SelectedProject = Projects[projectName];
+
+                    // Add a dummy task to be edited later
+                    SelectedProject.tasks.Add(new Task());
+                }
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
+        }
+
+        /// <summary>
+        /// Count finished tasks.
         /// </summary>
         /// <returns>Number of finished tasks</returns>
         public int CountFinishedTasks()
@@ -54,7 +79,7 @@ namespace ToDoLy
         }
 
         /// <summary>
-        /// Count unfinished tasks
+        /// Count unfinished tasks.
         /// </summary>
         /// <returns>Number of finished tasks</returns>
         public int CountUnfinishedTasks()
@@ -69,7 +94,7 @@ namespace ToDoLy
         }
 
         /// <summary>
-        /// Add task
+        /// Add task.
         /// </summary>
         /// <param name="projectName"></param>
         /// <param name="taskName"></param>
@@ -90,20 +115,37 @@ namespace ToDoLy
         }
 
         /// <summary>
-        /// Remove a task
+        /// Remove a task.
         /// </summary>
+        /// <returns>True if removing the task was successful.</returns>
         /// <param name="task1"></param>
-        public void RemoveTask(Task task1)
+        public bool RemoveTask(Task task1)
         {
-            // ToDo
-            if (Projects.ContainsKey(SelectedProject.projectName))
+            try
             {
-                Projects[SelectedProject.projectName].RemoveTask(task1);
-            }     
+                if (Projects.ContainsKey(SelectedProject.projectName))
+                {
+                    Projects[SelectedProject.projectName].RemoveTask(task1);
+
+                    // If all tasks are deleted, delete the project.
+                    if(Projects[SelectedProject.projectName].tasks.Count == 0)
+                    {
+                        Projects.Remove(SelectedProject.projectName);
+                        SetCurrentProject("Work"); // Set the default project.
+                    }
+
+                    return true;
+                }
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            return false;
         }
 
         /// <summary>
-        /// Edit a task
+        /// Edit a task.
         /// </summary>
         /// <param name="projectName"></param>
         /// <param name="taskIndex"></param>
@@ -114,7 +156,7 @@ namespace ToDoLy
         }
 
         /// <summary>
-        /// Sort tasks by the project name
+        /// Sort tasks by the project name.
         /// </summary>
         public void SortTasksByProject()
         {
@@ -135,11 +177,10 @@ namespace ToDoLy
 
             // Sort each project according to the date of the first task
             SortedProjects = Projects.OrderBy(item => item.Value.sortedTasks[0].DueDate).ToDictionary();
-
         }
 
         /// <summary>
-        /// Sort tasks by date descending
+        /// Sort tasks by date descending.
         /// </summary>
         public void SortTasksByDateDescending()
         {
