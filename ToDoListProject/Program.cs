@@ -1,11 +1,4 @@
-﻿// Requirements
-// Model a task with a task title, due date, status and project
-// Display a collection of tasks that can be sorted both by date and project
-//Support the ability to add, edit, mark as done, and remove tasks
-// Support a text-based user interface
-// Load and save task lists to file. The solution may also include other creative features at your discretion in case you wish to show some flair.
-
-using System.Xml.Linq;
+﻿using System.Xml.Linq;
 using ToDoLy;
 using System.IO;
 using static System.Net.Mime.MediaTypeNames;
@@ -91,6 +84,7 @@ void MainMenuAction(string options)
                 string dueDate = Console.ReadLine();
                 todoly.AddTask(projectName, taskName, Convert.ToDateTime(dueDate));
                 Console.WriteLine("Task added successfully!");
+                EditTaskMenu();
             }
             catch(Exception ex)
             {
@@ -140,7 +134,6 @@ void CreateNewProject(string projectName)
             task1.Status = 0;
 
             Console.WriteLine("Done!");
-
         }
         catch(Exception ex)
         {
@@ -232,21 +225,15 @@ void TaskOperations(ToDoLy.Task task1, string options)
     switch (options.ToLower())
     {
         case "d":
-            // Delete the task.
-            Console.Write("\nEnter \"D\" again to delete this task: | \"Q\" to quit: ");
-            userInput = Console.ReadLine();
-
-            if (userInput.ToLower() == "d")
+            // Delete the task.    
+            if (todoly.RemoveTask(task1))
             {
-                if (todoly.RemoveTask(task1))
-                {
-                    Console.WriteLine("Task removed successfully!");
-                }
-                else
-                {
-                    Console.WriteLine($"{RED}The task could not be removed!{NORMAL}");
-                }
+                Console.WriteLine("Task removed successfully!");
             }
+            else
+            {
+                Console.WriteLine($"{RED}The task could not be removed!{NORMAL}");
+            }         
             break;
         case "t":
             // alter the title.
