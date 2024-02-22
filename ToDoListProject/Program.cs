@@ -84,7 +84,7 @@ void CreateNewProject(string projectName)
     string userInput = Console.ReadLine();
 
    if(userInput.ToLower() == "y")
-    {
+   {
         try
         {
             todoly.AddProject(projectName);
@@ -110,8 +110,8 @@ void CreateNewProject(string projectName)
         {
             Console.WriteLine($"{RED}{ex.Message}{NORMAL}");
         }
-        return;
     }
+    return;
 }
 
 // Edit the task menu
@@ -256,7 +256,6 @@ void AddTask()
         string dueDate = Console.ReadLine();
         todoly.AddTask(projectName, taskName, Convert.ToDateTime(dueDate));
         Console.WriteLine("Task added successfully!");
-        EditTaskMenu();
     }
     catch (Exception ex)
     {
