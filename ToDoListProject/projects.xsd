@@ -1,0 +1,34 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="XMLSchema1"
+    targetNamespace="http://tempuri.org/XMLSchema1.xsd"
+    elementFormDefault="qualified"
+    xmlns="http://tempuri.org/XMLSchema1.xsd"
+    xmlns:mstns="http://tempuri.org/XMLSchema1.xsd"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+>
+	<xs:element name="projects">	
+		<xs:complexType>
+			<xs:sequence>
+			<xs:element name="project" maxOccurs="unbounded">
+				<xs:complexType>
+					<xs:sequence>
+						<xs:element name="task" maxOccurs="unbounded">
+							<xs:complexType>
+								<xs:sequence>
+									<xs:element name="date" type="xs:date"/>
+									<xs:element name="status" type="xs:integer"/>
+									
+									
+								</xs:sequence>
+								<xs:attribute name="title" type="xs:string" use="required"/>
+							</xs:complexType>
+							
+						</xs:element>
+					</xs:sequence>
+					<xs:attribute name="name" type="xs:string" use="required"/>
+				</xs:complexType>
+			</xs:element>
+			</xs:sequence>
+		</xs:complexType>	
+	</xs:element>
+</xs:schema>

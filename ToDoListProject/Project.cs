@@ -15,19 +15,24 @@ namespace ToDoLy
         /// </summary>
         public List<Task> tasks { get;set; }
         public List<Task> sortedTasks { get; set; }
-       
+
         public string projectName { get; set; }
 
         public Project(string name)
         {
             projectName = name;
-            tasks = new List<Task>();
+            tasks = new List<Task>();  
             sortedTasks = tasks;
         }
 
-        public void SortTasksByDate()
+        public void SortTasksByDateAscending()
         {
             sortedTasks = tasks.OrderBy(item => item.DueDate).ToList();
+        }
+
+        public void SortTasksByDateDescending()
+        {
+            sortedTasks = tasks.OrderByDescending(item => item.DueDate).ToList();
         }
 
         /// <summary>
@@ -69,10 +74,6 @@ namespace ToDoLy
         public void RemoveTask(Task task1)
         {
             tasks.Remove(task1);
-        }
-
-       
-
-      
+        }  
     }
 }
