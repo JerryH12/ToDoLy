@@ -1,11 +1,4 @@
-﻿using System.Xml.Linq;
-using ToDoLy;
-using System.IO;
-using static System.Net.Mime.MediaTypeNames;
-using System.Net.Http;
-using System.Diagnostics;
-using System.Reflection.Metadata.Ecma335;
-using System;
+﻿using ToDoLy;
 
 string NL = Environment.NewLine; // shortcut
 string NORMAL = Console.IsOutputRedirected ? "" : "\x1b[39m";
@@ -26,29 +19,24 @@ string NOREVERSE = Console.IsOutputRedirected ? "" : "\x1b[27m";
 ToDoList todoly = new ToDoList();
 
 bool go = true;
-bool skipMenu = false;
 
 while (go)
 {
     string input = "";
 
-    // check whether to continue with the previous input or select another one.
-    if (!skipMenu) 
-    {
-        // The main menu
-        Console.WriteLine($"{CYAN}>>{NORMAL} {BOLD}{MAGENTA}WELCOME TO TODOLY{NORMAL}{NOBOLD}");
-        Console.WriteLine($"{CYAN}>>{NORMAL} You have {YELLOW}{todoly.CountUnfinishedTasks()} tasks todo{NORMAL} and {GREEN}{todoly.CountFinishedTasks()} tasks are done!{GREEN}{NORMAL}");
-        Console.WriteLine($"{CYAN}>>{NORMAL} Pick an option:");
-        Console.WriteLine($"{CYAN}>>{NORMAL} ({MAGENTA}1{NORMAL}) Show To-Do list");
-        Console.WriteLine($"{CYAN}>>{NORMAL} ({MAGENTA}2{NORMAL}) List Sorted by Project");
-        Console.WriteLine($"{CYAN}>>{NORMAL} ({MAGENTA}3{NORMAL}) List Sorted by Date Descending");
-        Console.WriteLine($"{CYAN}>>{NORMAL} ({MAGENTA}4{NORMAL}) See and Edit Tasks in {CYAN}{todoly.SelectedProject.projectName}{NORMAL}");
-        Console.WriteLine($"{CYAN}>>{NORMAL} ({MAGENTA}5{NORMAL}) Add New Task in {CYAN}{todoly.SelectedProject.projectName}{NORMAL}");
-        Console.WriteLine($"{CYAN}>>{NORMAL} ({MAGENTA}6{NORMAL}) Save and Quit");
+    // The main menu
+    Console.WriteLine($"{CYAN}>>{NORMAL} {BOLD}{MAGENTA}WELCOME TO TODOLY{NORMAL}{NOBOLD}");
+    Console.WriteLine($"{CYAN}>>{NORMAL} You have {YELLOW}{todoly.CountUnfinishedTasks()} tasks todo{NORMAL} and {GREEN}{todoly.CountFinishedTasks()} tasks are done!{GREEN}{NORMAL}");
+    Console.WriteLine($"{CYAN}>>{NORMAL} Pick an option:");
+    Console.WriteLine($"{CYAN}>>{NORMAL} ({MAGENTA}1{NORMAL}) Show To-Do list");
+    Console.WriteLine($"{CYAN}>>{NORMAL} ({MAGENTA}2{NORMAL}) List Sorted by Project");
+    Console.WriteLine($"{CYAN}>>{NORMAL} ({MAGENTA}3{NORMAL}) List Sorted by Date Descending");
+    Console.WriteLine($"{CYAN}>>{NORMAL} ({MAGENTA}4{NORMAL}) See and Edit Tasks in {CYAN}{todoly.SelectedProject.projectName}{NORMAL}");
+    //Console.WriteLine($"{CYAN}>>{NORMAL} ({MAGENTA}5{NORMAL}) Add New Task in {CYAN}{todoly.SelectedProject.projectName}{NORMAL}");
+    Console.WriteLine($"{CYAN}>>{NORMAL} ({MAGENTA}5{NORMAL}) Save and Quit");
 
-        input = Console.ReadLine();
-    }
-    skipMenu = false;
+    input = Console.ReadLine();
+     
     MainMenuAction(input); 
 }
 
@@ -74,28 +62,11 @@ void MainMenuAction(string options)
             todoly.SortTasksByDateDescending();
             todoly.ShowToDoList();
             break;
-        case "5":
-            try
-            {
-                // Add a new task.
-                Console.Write("Enter a name for the new task: ");
-                string taskName = Console.ReadLine();
-                Console.Write("Enter the date for the deadline: ");
-                string dueDate = Console.ReadLine();
-                todoly.AddTask(projectName, taskName, Convert.ToDateTime(dueDate));
-                Console.WriteLine("Task added successfully!");
-                EditTaskMenu();
-            }
-            catch(Exception ex)
-            {
-                Console.WriteLine($"{RED}{ex.Message}{NORMAL}");
-            }
-            break;
         case "4":
             // Edit a task
             EditTaskMenu(); 
             break;
-        case "6":
+        case "5":
             // Save and quit.
             todoly.SaveToFile();
             go = false;
@@ -161,14 +132,19 @@ void EditTaskMenu()
         index++;
     }
 
-    Console.WriteLine("\nEnter a number to edit a task: | To select another project - enter \"P\": | \"Q\" to quit: ");
+    Console.WriteLine("\nTo edit task - enter a number: | To select another project - enter \"P\": | To add a task - enter \"A\": | \"Q\" to quit: ");
 
     try
     {
         // Select the task to be edited or deleted.
         string userInput = Console.ReadLine().ToLower();
 
-        if (int.TryParse(userInput, out int value))
+        if(userInput == "a")
+        {
+            AddTask();
+            EditTaskMenu();
+        }
+        else if (int.TryParse(userInput, out int value))
         {
             int taskID = value - 1;
             ToDoLy.Task currentTask = todoly.SelectedProject.tasks.ElementAt(taskID);
@@ -206,7 +182,7 @@ void EditTaskMenu()
                 Console.WriteLine($"{RED}The selected project doesn't exist!{NORMAL}");
                 CreateNewProject(userInput);
             }
-           // skipMenu = true; // jump to switch without menu.
+          
             EditTaskMenu(); // repeat this function.
         }
     }
@@ -266,6 +242,27 @@ void TaskOperations(ToDoLy.Task task1, string options)
     }
     // return to previous menu.
     EditTaskMenu();
+}
+
+void AddTask()
+{
+    try
+    {
+        // Add a new task.
+        string projectName = todoly.SelectedProject.projectName;
+        Console.Write("Enter a name for the new task: ");
+        string taskName = Console.ReadLine();
+        Console.Write("Enter the date for the deadline: ");
+        string dueDate = Console.ReadLine();
+        todoly.AddTask(projectName, taskName, Convert.ToDateTime(dueDate));
+        Console.WriteLine("Task added successfully!");
+        EditTaskMenu();
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"{RED}{ex.Message}{NORMAL}");
+    }
+    return;
 }
 
 
